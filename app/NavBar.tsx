@@ -3,8 +3,11 @@ import Link from 'next/link';
 import { AiFillBug } from 'react-icons/ai';
 import { usePathname } from 'next/navigation';
 import classnames from 'classnames';
+import { useSession } from 'next-auth/react';
+import { Box } from '@radix-ui/themes';
 
 const NavBar = () => {
+  const { status, data: session } = useSession();
   const links = [
     { label: 'Dashboard', href: '/' },
     { label: 'Issues', href: '/issues' },
@@ -16,19 +19,30 @@ const NavBar = () => {
       <Link href="/">
         <AiFillBug />
       </Link>
-      {links.map((link) => (
-        <Link
-          className={classnames({
-            'hover:text-zinc-900': link.href === currentPath,
-            'text-zinc-500': link.href !== currentPath,
-            'transition-colors': true,
-          })}
-          href={link.href}
-          key={link.href}
-        >
-          {link.label}
-        </Link>
-      ))}
+      <ul className="flex space-x-6">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link
+              className={classnames({
+                'hover:text-zinc-900': link.href === currentPath,
+                'text-zinc-500': link.href !== currentPath,
+                'transition-colors': true,
+              })}
+              href={link.href}
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+        <Box>
+          {status === 'authenticated' && (
+            <Link href="api/auth/signout">Log out</Link>
+          )}
+          {status === 'unauthenticated' && (
+            <Link href="api/auth/signin">Login</Link>
+          )}
+        </Box>
+      </ul>
     </nav>
   );
 };
