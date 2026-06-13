@@ -10,6 +10,7 @@ import {
   Container,
   DropdownMenu,
   Flex,
+  Skeleton,
   Text,
 } from '@radix-ui/themes';
 
@@ -60,7 +61,7 @@ const NavLinks = () => {
 const AuthStatus = () => {
   const { status, data: session } = useSession();
 
-  if (status === 'loading') return null;
+  if (status === 'loading') return <Skeleton width="3rem" height="1rem" />;
 
   if (status === 'unauthenticated')
     return (
