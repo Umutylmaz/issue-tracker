@@ -1,10 +1,16 @@
 'use client';
-import { Status } from '@prisma/client';
+import { Issue, Status } from '@prisma/client';
 import { Select } from '@radix-ui/themes';
+import axios from 'axios';
 
-const IssueStatusSelect = ({ status }: { status: Status }) => {
+const IssueStatusSelect = ({ issue }: { issue: Issue }) => {
   return (
-    <Select.Root defaultValue={status}>
+    <Select.Root
+      defaultValue={issue.status}
+      onValueChange={(status) => {
+        axios.patch('/api/issues/' + issue.id, { status });
+      }}
+    >
       <Select.Trigger />
       <Select.Content>
         <Select.Group>
