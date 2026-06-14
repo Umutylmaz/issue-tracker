@@ -1,8 +1,7 @@
 'use client';
 import { Issue, Status } from '@prisma/client';
 import { Flex, Select, Text } from '@radix-ui/themes';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import { patchIssue } from '@/app/services/issueService';
 
 const IssueStatusSelect = ({ issue }: { issue: Issue }) => {
   return (
@@ -19,12 +18,7 @@ const IssueStatusSelect = ({ issue }: { issue: Issue }) => {
         <Select.Root
           defaultValue={issue.status}
           onValueChange={(status) => {
-            axios
-              .patch('/api/issues/' + issue.id, { status })
-              .then(() => toast.success('Changes saved successfully'))
-              .catch(() => {
-                toast.error('Changes could not be saved.');
-              });
+            patchIssue(issue.id, { status });
           }}
         >
           <Select.Trigger />
