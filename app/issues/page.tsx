@@ -4,25 +4,39 @@ import { Table } from '@radix-ui/themes';
 import NextLink from 'next/link';
 import IssueActions from './_components/IssueActions';
 import { Issue, Status } from '@prisma/client';
-import { ArrowUpIcon } from '@radix-ui/react-icons';
+import { ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
 
 interface Props {
-  searchParams: Promise<{ status: Status; orderBy: keyof Issue }>;
+  searchParams: Promise<{
+    status: Status;
+    orderBy: keyof Issue;
+    sortOrder: 'asc' | 'desc';
+  }>;
 }
 
 const IssuesPage = async ({ searchParams }: Props) => {
-  const statuses = Object.values(Status);
-  const resolvedParams = await searchParams;
-  const status = statuses.includes(resolvedParams.status)
-    ? resolvedParams.status
-    : undefined;
-  const issues = await prisma.issue.findMany({ where: { status } });
-
   const columns: { label: string; value: keyof Issue; className?: string }[] = [
     { label: 'Issue', value: 'title' },
     { label: 'Status', value: 'status', className: 'hidden md:table-cell' },
     { label: 'Created', value: 'createdAt', className: 'hidden md:table-cell' },
   ];
+
+  const statuses = Object.values(Status);
+  const resolvedParams = await searchParams;
+  const status = statuses.includes(resolvedParams.status)
+    ? resolvedParams.status
+    : undefined;
+
+  const sortOrder = resolvedParams.sortOrder === 'desc' ? 'desc' : 'asc';
+  const orderBy = columns
+    .map((column) => column.value)
+    .includes(resolvedParams.orderBy)
+    ? { [resolvedParams.orderBy]: sortOrder }
+    : undefined;
+  const issues = await prisma.issue.findMany({
+    where: { status },
+    orderBy,
+  });
 
   return (
     <div>
@@ -34,14 +48,25 @@ const IssuesPage = async ({ searchParams }: Props) => {
               <Table.ColumnHeaderCell key={column.value}>
                 <NextLink
                   href={{
-                    query: { ...resolvedParams, orderBy: column.value },
+                    query: {
+                      ...resolvedParams,
+                      orderBy: column.value,
+                      sortOrder:
+                        column.value === resolvedParams.orderBy &&
+                        sortOrder === 'asc'
+                          ? 'desc'
+                          : 'asc',
+                    },
                   }}
                 >
                   {column.label}
                 </NextLink>
-                {column.value === resolvedParams.orderBy && (
-                  <ArrowUpIcon className="inline" />
-                )}
+                {column.value === resolvedParams.orderBy &&
+                  (sortOrder === 'asc' ? (
+                    <ArrowUpIcon className="inline" />
+                  ) : (
+                    <ArrowDownIcon className="inline" />
+                  ))}
               </Table.ColumnHeaderCell>
             ))}
           </Table.Row>
