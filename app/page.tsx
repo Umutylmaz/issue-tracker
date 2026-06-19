@@ -1,3 +1,4 @@
+import IssueChart from '@/IssueChart';
 import IssueSummary from '@/IssueSummary';
 import LatestIssues from '@/LatestIssues';
 import { prisma } from '@/prisma/client';
@@ -12,6 +13,7 @@ export default async function Home() {
 
   return (
     <Flex direction="column" gap="5">
+      <IssueChart open={open} inProgress={inProgress} closed={closed} />
       <IssueSummary open={open} inProgress={inProgress} closed={closed} />
       <LatestIssues />
     </Flex>
