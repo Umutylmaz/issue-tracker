@@ -1,3 +1,5 @@
+const { withSentryConfig } = require("@sentry/nextjs");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     async headers(){
@@ -10,4 +12,9 @@ const nextConfig = {
     }
 }
 
-module.exports = nextConfig
+module.exports = withSentryConfig(nextConfig, {
+  org: "myself-o6x",
+  project: "javascript-nextjs",
+  silent: !process.env.CI,
+  tunnelRoute: "/monitoring",
+});
